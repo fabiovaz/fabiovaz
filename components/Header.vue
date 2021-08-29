@@ -1,6 +1,14 @@
 <template>
   <div>
     <header>
+      <div class="logo">
+        <NuxtLink to="/">
+          <svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="f" d="M14.3588 3.85953H23.3434L25.5636 0H0L2.22021 3.85953H6.66064H14.3588Z" />
+            <path class="v" d="M29.9833 0L27.7838 3.85953L17.2222 22.2601L11.0803 11.5786H13.8608H14.4625H18.9029L21.1232 7.71905H8.86011H7.05489H4.44043L17.2222 30L34.4444 0H29.9833Z" />
+          </svg>
+        </NuxtLink>
+      </div>
       <div class="hamburguer" @click="navOpen = !navOpen">
         <span class="bar" />
         <span class="bar" />
@@ -48,8 +56,24 @@ export default {
 </script>
 
 <style lang="scss">
-nav {
+header {
   z-index: 10;
+  position: fixed;
+  width: 100%;
+}
+.logo {
+  position: fixed;
+  top: 60px;
+  left: 60px;
+  .f {
+    fill: #777;
+  }
+  .v {
+    fill: #999;
+  }
+}
+nav {
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +83,6 @@ nav {
   left: 0;
   width: 100%;
   height: 100%;
-  background: blue;
   a {
     padding: 30px 0;
   }
@@ -75,7 +98,7 @@ nav {
   right: 60px;
   .bar {
     display: block;
-    background: #929292;
+    background: #909090;
     height: 2px;
     margin-bottom: 8px;
     transition: all 0.3s;
