@@ -15,24 +15,27 @@
         <a href="#">0{{ index + 1 }}</a>
       </div>
     </div>
-    <div id="caption">
-      <div class="number">
-        0{{ slider.current }}
-      </div>
-      <div class="title">
-        <div class="text">
-          {{ slider.caption.title }}
+    <client-only>
+      <div id="caption">
+        <div class="number">
+          0{{ slider.caption.index }}
         </div>
-        <div class="shadow">
-          <div class="text">
+        <div class="title">
+          <div v-lettering class="text">
             {{ slider.caption.title }}
           </div>
+          <div class="shadow">
+            <div v-lettering class="text">
+              {{ slider.caption.title }}
+            </div>
+          </div>
+        </div>
+        <div class="description">
+          <div class="mask" />
+          <p>{{ slider.caption.subtitle }}</p>
         </div>
       </div>
-      <div class="description">
-        <p>{{ slider.caption.subtitle }}</p>
-      </div>
-    </div>
+    </client-only>
   </div>
 </template>
 
@@ -54,6 +57,7 @@ export default {
         current: 1,
         timer: 4000,
         caption: {
+          index: null,
           title: null,
           subtitle: null,
           slug: null
@@ -83,25 +87,46 @@ export default {
       if (direction === 'prev') {
         if (this.slider.current === 1) { this.slider.current = (this.slider.total) } else { this.slider.current-- }
       }
-      this.enter(this.slider.current)
+      setTimeout(() => this.enter(this.slider.current), 600)
     },
     enter (index) {
+      this.slider.caption = { ...this.slider.caption, index, title: this.jobs[index - 1].title, subtitle: this.jobs[index - 1].subtitle, slug: this.jobs[index - 1].slug }
       this.$anime({
-        delay: 160,
-        easing: 'easeOutExpo',
         targets: `#jobs .job:nth-child(${index})`,
+        duration: 600,
+        easing: 'easeOutQuart',
         opacity: [0, 1],
         scale: [2, 1]
       })
-      this.slider.caption = { ...this.slider.caption, title: this.jobs[index - 1].title, subtitle: this.jobs[index - 1].subtitle, slug: this.jobs[index - 1].slug }
+      this.$anime({
+        targets: '#caption .title .text span',
+        duration: 1000,
+        easing: 'easeOutQuart',
+        delay: this.$anime.stagger(100),
+        opacity: [0, 1]
+      })
+      this.$anime({
+        targets: '#caption .description .mask',
+        duration: 400,
+        easing: 'easeOutExpo',
+        left: ['0%', '100%']
+      })
       this.timer()
     },
+
     exit (index) {
       this.$anime({
-        easing: 'easeOutExpo',
+        duration: 600,
+        easing: 'easeInQuart',
         targets: `#jobs .job:nth-child(${index})`,
         opacity: 0,
         scale: 1.2
+      })
+      this.$anime({
+        duration: 600,
+        easing: 'easeInExpo',
+        targets: '#caption .description .mask',
+        left: ['-100%', '0%']
       })
     },
     timer () {
@@ -112,7 +137,7 @@ export default {
       this.$anime({
         targets: timer,
         prop: 100,
-        duration: 8000,
+        duration: 4000,
         complete () {
           that.next()
         }
@@ -128,7 +153,6 @@ export default {
   position: absolute;
   top: 50%;
   left: 60px;
-  width: 100%;
   transform: translateY(-50%);
   .number {
     position: absolute;
@@ -141,7 +165,6 @@ export default {
   }
   .title {
     position: relative;
-    display: inline-block;
     overflow: hidden;
     cursor: pointer;
     .text {
@@ -195,15 +218,23 @@ export default {
   }
   .description {
     position: relative;
-    max-width: 420px;
     overflow: hidden;
+    display: inline-block;
+    .mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #eee;
+    }
     p {
+      margin: 0;
       font-family: 'Bebas Neue', sans-serif;
       color: #eee;
       font-size: 18px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      margin: 0;
     }
   }
 }
