@@ -18,7 +18,7 @@ body {
   font-family: 'Inconsolata';
 }
 #error-effect {
-  z-index: 4;
+  z-index: 1;
   position: absolute;
   top: 0;
   left: 0;
@@ -49,7 +49,7 @@ body {
   }
 }
 #error-glitch {
-  z-index: 5;
+  z-index: 2;
   position: absolute;
   width: 100%;
   height: 100%;

@@ -2,7 +2,6 @@
   <div>
     <div id="jobs">
       <div v-for="job in jobs" :key="job.slug" class="job">
-        {{ job }}
         <div class="background">
           <img :src="job.cover.url">
           <img :src="job.cover.url">
@@ -10,32 +9,30 @@
       </div>
     </div>
     <div id="paginator">
-      <div v-for="(job, index) in jobs" :key="job.id" class="item" :class="{ active: (slider.current - 1) == index}">
+      <div v-for="(job, index) in jobs" :key="job.id" class="item" :class="{ active: (slider.current) == index}" @click="change(index)">
         <span>{{ job.title }}</span>
         <a href="#">0{{ index + 1 }}</a>
       </div>
     </div>
-    <client-only>
-      <div id="caption">
-        <div class="number">
-          0{{ slider.caption.index }}
+    <div id="caption">
+      <div class="number">
+        0{{ slider.caption.index + 1 }}
+      </div>
+      <div v-if="slider.caption.title" class="title">
+        <div v-lettering class="text">
+          {{ slider.caption.title }}
         </div>
-        <div class="title">
+        <div v-if="slider.caption.title" class="shadow">
           <div v-lettering class="text">
             {{ slider.caption.title }}
           </div>
-          <div class="shadow">
-            <div v-lettering class="text">
-              {{ slider.caption.title }}
-            </div>
-          </div>
-        </div>
-        <div class="description">
-          <div class="mask" />
-          <p>{{ slider.caption.subtitle }}</p>
         </div>
       </div>
-    </client-only>
+      <div class="description">
+        <div class="mask" />
+        <p>{{ slider.caption.subtitle }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -54,8 +51,9 @@ export default {
       jobs: [],
       slider: {
         total: 0,
-        current: 1,
-        timer: 4000,
+        current: 0,
+        timer: null,
+        timeout: null,
         caption: {
           index: null,
           title: null,
@@ -66,82 +64,127 @@ export default {
     }
   },
   mounted () {
-    this.start()
+    this.$nextTick(() => {
+      this.slider.total = this.jobs.length - 1
+      this.enter(0)
+    })
   },
   methods: {
+    teste () {
+      clearInterval(this.slider.timer)
+    },
     next () {
-      this.change('next')
+      const slide = this.slider.current < this.slider.total ? this.slider.current + 1 : 0
+      this.change(slide)
     },
     prev () {
-      this.change('prev')
+      const slide = this.slider.current === 1 ? this.slider.total : this.slider.current - 1
+      this.change(slide)
     },
-    start () {
-      this.slider.total = this.jobs.length
-      this.enter(1)
-    },
-    change (direction) {
+    change (value) {
+      clearInterval(this.slider.timer)
+      clearTimeout(this.slider.timeout)
       this.exit(this.slider.current)
-      if (direction === 'next') {
-        if (this.slider.current < this.slider.total) { this.slider.current++ } else { this.slider.current = 1 }
-      }
-      if (direction === 'prev') {
-        if (this.slider.current === 1) { this.slider.current = (this.slider.total) } else { this.slider.current-- }
-      }
-      setTimeout(() => this.enter(this.slider.current), 600)
+      this.slider.current = value
+      this.slider.timeout = setTimeout(() => {
+        this.enter(this.slider.current)
+      }, 900)
     },
     enter (index) {
-      this.slider.caption = { ...this.slider.caption, index, title: this.jobs[index - 1].title, subtitle: this.jobs[index - 1].subtitle, slug: this.jobs[index - 1].slug }
-      this.$anime({
-        targets: `#jobs .job:nth-child(${index})`,
-        duration: 600,
-        easing: 'easeOutQuart',
-        opacity: [0, 1],
-        scale: [2, 1]
-      })
-      this.$anime({
-        targets: '#caption .title .text span',
-        duration: 1000,
-        easing: 'easeOutQuart',
-        delay: this.$anime.stagger(100),
-        opacity: [0, 1]
-      })
-      this.$anime({
-        targets: '#caption .description .mask',
-        duration: 400,
-        easing: 'easeOutExpo',
-        left: ['0%', '100%']
+      this.slider.caption = { ...this.slider.caption, index, title: this.jobs[index].title, subtitle: this.jobs[index].subtitle, slug: this.jobs[index].slug }
+      this.$nextTick(() => {
+        const anime = this.$anime
+        anime({
+          targets: `#jobs .job:nth-child(${index + 1})`,
+          duration: 1000,
+          easing: 'easeOutExpo',
+          opacity: [0, 1],
+          scale: [2, 1]
+        })
+        anime({
+          targets: '#caption .title > .text span',
+          duration: 600,
+          easing: 'easeInQuad',
+          delay: anime.stagger(60),
+          opacity: [0, 1]
+        })
+        anime({
+          targets: '#caption .title .shadow > .text span',
+          duration: 600,
+          easing: 'easeInQuad',
+          delay: anime.stagger(60),
+          opacity: [0, 1]
+        })
+        anime.set('#caption .description p', {
+          opacity: 0
+        })
+        anime({
+          targets: '#caption .description .mask',
+          duration: 800,
+          easing: 'easeInExpo',
+          left: ['-100%', '0%'],
+          complete () {
+            anime.set('#caption .description p', {
+              opacity: 1
+            })
+            anime({
+              targets: '#caption .description .mask',
+              duration: 800,
+              easing: 'easeOutExpo',
+              left: ['0%', '100%']
+            })
+          }
+        })
       })
       this.timer()
     },
 
     exit (index) {
-      this.$anime({
-        duration: 600,
-        easing: 'easeInQuart',
-        targets: `#jobs .job:nth-child(${index})`,
-        opacity: 0,
-        scale: 1.2
-      })
-      this.$anime({
-        duration: 600,
-        easing: 'easeInExpo',
-        targets: '#caption .description .mask',
-        left: ['-100%', '0%']
+      this.slider.caption = { ...this.slider.caption, index, title: this.jobs[index].title, subtitle: this.jobs[index].subtitle, slug: this.jobs[index].slug }
+      this.$nextTick(() => {
+        const anime = this.$anime
+        anime({
+          duration: 1000,
+          easing: 'easeInQuart',
+          targets: `#jobs .job:nth-child(${index + 1})`,
+          opacity: 0,
+          scale: 1.2
+        })
+        anime({
+          targets: '#caption .title > .text span',
+          duration: 400,
+          easing: 'easeOutQuad',
+          delay: anime.stagger(30),
+          opacity: 0
+        })
+        anime({
+          targets: '#caption .title .shadow > .text span',
+          duration: 400,
+          easing: 'easeOutQuad',
+          delay: anime.stagger(30),
+          opacity: 0
+        })
+        anime({
+          duration: 600,
+          easing: 'easeInExpo',
+          targets: '#caption .description .mask',
+          left: ['-100%', '0%'],
+          complete () {
+            anime.set('#caption .description p', {
+              opacity: 0
+            })
+            anime({
+              targets: '#caption .description .mask',
+              duration: 600,
+              easing: 'easeOutExpo',
+              left: ['0%', '100%']
+            })
+          }
+        })
       })
     },
     timer () {
-      const that = this
-      const timer = {
-        prop: 0
-      }
-      this.$anime({
-        targets: timer,
-        prop: 100,
-        duration: 4000,
-        complete () {
-          that.next()
-        }
-      })
+      this.slider.timer = setInterval(this.next, 6000)
     }
   }
 }
@@ -149,7 +192,7 @@ export default {
 
 <style lang="scss">
 #caption {
-  z-index: 10;
+  z-index: 5;
   position: absolute;
   top: 50%;
   left: 60px;
@@ -157,7 +200,7 @@ export default {
   .number {
     position: absolute;
     top: -140px;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Trump Gothic East', sans-serif;
     color: #333;
     font-size: 250px;
     line-height: 250px;
@@ -168,7 +211,7 @@ export default {
     overflow: hidden;
     cursor: pointer;
     .text {
-      font: 800 90px/90px 'Bebas Neue', sans-serif;
+      font: 800 90px/90px 'Trump Gothic East', sans-serif;
       text-transform: uppercase;
       color: #eee;
       animation: textBlink 2s normal infinite;
@@ -230,7 +273,7 @@ export default {
     }
     p {
       margin: 0;
-      font-family: 'Bebas Neue', sans-serif;
+      font-family: 'Trump Gothic East', sans-serif;
       color: #eee;
       font-size: 18px;
       letter-spacing: 1px;

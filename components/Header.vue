@@ -46,7 +46,7 @@ export default {
       if (e.defaultPrevented) {
         return
       }
-      const key = e.key || e.keyCode
+      const key = e.key
       if (key === 'Escape' || key === 'Esc' || key === 27) {
         this.navOpen = false
       }
@@ -73,7 +73,7 @@ header {
   }
 }
 nav {
-  z-index: 1;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,12 +84,21 @@ nav {
   width: 100%;
   height: 100%;
   a {
-    padding: 30px 0;
+    position: relative;
+    padding: 10px 20px;
+    font-family: 'Trump Gothic East', sans-serif;
+    font-size: 58px;
+    color: #eee;
+    opacity: .5;
+    overflow: hidden;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 1s;
   }
 }
 
 .hamburguer {
-  z-index: 55;
+  z-index: 15;
   position: absolute;
   display: block;
   width: 30px;
@@ -113,6 +122,15 @@ nav {
       width: 27px;
       margin-left: 3px;
       margin-bottom: 0;
+    }
+  }
+  &:hover {
+    cursor: pointer;
+    .bar {
+      &:nth-child(1), &:nth-child(2), &:nth-child(3) {
+        width: 30px;
+        margin-left: 0;
+      }
     }
   }
 }
