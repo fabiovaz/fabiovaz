@@ -1,12 +1,26 @@
 <template>
-  <div class="caption">
-    <client-only>
-      <h1 class="anime">
-        NUXT ANIMEJS
-      </h1>
-    </client-only>
-    {{ about.title }}
-    {{ about.description }}
+  <div id="about">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-3">
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div v-html="$md.render(about.title)" />
+
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div v-html="$md.render(about.description)" />
+
+          <Link :href="'https://wa.me/5561999561012'">
+            Whatsapp
+          </Link>
+          <Link :href="'mailto:fabiovaz@gmail.com'">
+            Email
+          </Link>
+          <Link :href="'https://www.linkedin.com/in/fabio-vaz-95a19631/'">
+            LinkedIn
+          </Link>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,33 +33,36 @@ export default {
     } catch (e) {
       error(e)
     }
-  },
-  mounted () {
-    this.startAnim()
-  },
-  methods: {
-    startAnim () {
-      this.$anime({
-        easing: 'easeOutExpo',
-        targets: '.anime',
-        opacity: 0,
-        scale: 1.2
-      })
-    }
   }
 }
 </script>
 
 <style lang="scss">
-.caption {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+#about {
+  z-index: 5;
+  position: relative;
+  padding: 160px 0 60px 0;
+  text-align: center;
+  h1, h2, h3, h4 {
+    margin: 0;
+  }
+  h1 {
+    font-family: 'Trump Gothic East', sans-serif;
+    font-size: 88px;
+    line-height: 68px;
+  }
+  h2 {
+    font-family: 'Trump Gothic East', sans-serif;
+    font-size: 32px;
+    line-height: 32px;
+  }
+  h3 {
+    font-size: 22px;
+    line-height: 22px;
+  }
+  h4 {
+    font-size: 16px;
+    line-height: 22px;
+  }
 }
 </style>
