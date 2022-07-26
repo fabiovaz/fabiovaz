@@ -195,7 +195,6 @@ export default {
       this.timer()
     },
     exit (index) {
-      this.slider.caption = { ...this.slider.caption, index, title: this.jobs[index].title, subtitle: this.jobs[index].subtitle, slug: this.jobs[index].slug }
       this.$nextTick(() => {
         const anime = this.$anime
         anime.remove(`#jobs .job:nth-child(${this.slider.current + 1})`)
@@ -207,19 +206,21 @@ export default {
           scale: 1.2
         })
         anime.remove('#caption .title > .text span, #caption .title .flick > .text span')
-        anime({
-          targets: '#caption .title > .text span',
-          duration: 400,
-          easing: 'easeOutQuad',
-          delay: anime.stagger(30),
-          opacity: 0
-        })
-        anime({
-          targets: '#caption .title .flick > .text span',
-          duration: 400,
-          easing: 'easeOutQuad',
-          delay: anime.stagger(30),
-          opacity: 0
+        this.$nextTick(() => {
+          anime({
+            targets: '#caption .title > .text span',
+            duration: 400,
+            easing: 'easeOutQuad',
+            delay: anime.stagger(30),
+            opacity: 0
+          })
+          anime({
+            targets: '#caption .title .flick > .text span',
+            duration: 400,
+            easing: 'easeOutQuad',
+            delay: anime.stagger(30),
+            opacity: 0
+          })
         })
         anime.remove('#caption .description .mask')
         anime({
