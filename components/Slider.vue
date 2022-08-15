@@ -68,7 +68,7 @@ export default {
   },
   watch: {
     'state' (v) {
-      if (!v) {
+      if (!v && this.$route.path === '/') {
         this.hide()
       }
       if (v) {

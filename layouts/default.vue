@@ -11,7 +11,7 @@
           </svg>
         </NuxtLink>
       </div>
-      <div class="hamburguer" :class="{ 'open' : navOpen }" @click="navOpen = !navOpen; slider.state = !slider.state">
+      <div class="hamburguer" :class="{ 'open' : navOpen }" @click="navOpen = !navOpen">
         <span class="bar" />
         <span class="bar" />
         <span class="bar" />
@@ -36,9 +36,10 @@
     </nav>
 
     {{ slider.state }}
-    <Slider :jobs="slider.jobs" :state="slider.state" @changeState="slider.state = $event" />
-
-    <Nuxt />
+    <main :class="{ 'hidden' : navOpen }">
+      <Slider v-show="slider.state" :jobs="slider.jobs" :state="slider.state" @changeState="slider.state = $event" />
+      <Nuxt />
+    </main>
   </div>
 </template>
 
@@ -58,6 +59,7 @@ export default {
   },
   watch: {
     '$route.path' (v) {
+      this.slider.state = false
       if (v === '/') {
         this.slider.state = true
       }
@@ -301,6 +303,11 @@ nav {
         transform: rotate(-135deg) translateY(10px) translateX(4px);
       }
     }
+  }
+}
+main {
+  &.hidden {
+    opacity: 0;
   }
 }
 </style>
